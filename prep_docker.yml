@@ -1,0 +1,61 @@
+---
+
+- name: setup swarm cluster on master and worker nodes
+# =======================================================
+  hosts: all
+  gather_facts: true
+  become: true
+  vars:
+    distribution: "{{ ansible_distribution | lower }}"
+    swarm_port: 2377
+  tasks:
+    # - name: allow ports for docker swarm
+    #   iptables: chain=INPUT destination_port={{ item.port }} protocol={{ item.protocol }} jump=ACCEPT
+    #   with_items:
+    #     - {protocol: tcp, port: 2377}
+    #     - {protocol: tcp, port: 7946}
+    #     - {protocol: tcp, port: 4789}
+    #     - {protocol: udp, port: 7946}
+    #     - {protocol: udp, port: 4789}
+
+    - name: ensure https apt transport exists
+      package:
+        name: '{{ item }}'
+        state: present
+      with_items:
+        - apt-transport-https
+        - ca-certificates
+
+    - name: add docker-engine apt key
+      apt_key:
+        keyserver: 'hkp://p80.pool.sks-keyservers.net:80'
+        id: '58118E89F3A912897C070ADBF76221572C52609D'
+
+    - name: add docker-engine apt repository
+      apt_repository:
+        repo: "deb https://apt.dockerproject.org/repo {{ ansible_distribution | lower }}-{{ ansible_distribution_release }} main"
+        update_cache: yes
+        state: present
+
+    - name: install the docker package
+      package:
+        name: docker-engine
+        state: present
+
+    - block:
+      - name: initialize a new swarm on master node
+        command: docker swarm init --advertise-addr "{{ ansible_eth1["ipv4"]["address"] }}"
+
+      - name: get join worker token for swarm
+        command: docker swarm join-token worker -q
+        register: swarm_worker_token
+
+      - name: set join worker token fact
+        set_fact: swarm_worker_token="{{ swarm_worker_token.stdout }}"
+      when: inventory_hostname in ['m01']  # perform tasks only on master node
+
+    - debug: var=hostvars['m01']['swarm_worker_token']
+
+    - name: join worker nodes
+      command: docker swarm join --token "{{ hostvars['m01']['swarm_worker_token'] }}" "{{ hostvars['m01']['ansible_eth1']['ipv4']['address'] }}:2377"
+      when: inventory_hostname in ['w01','w02']
