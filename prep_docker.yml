@@ -1,6 +1,6 @@
 ---
 
-- name: setup swarm cluster on master and worker nodes
+- name: setup swarm cluster on manager and worker nodes
 # =======================================================
   hosts: all
   gather_facts: true
@@ -49,7 +49,7 @@
       user: append=yes groups=docker name=vagrant
 
     - block:
-      - name: initialize a new swarm on master node
+      - name: initialize a new swarm on manager node
         command: docker swarm init --advertise-addr "{{ ansible_eth1["ipv4"]["address"] }}"
 
       - name: get join worker token for swarm
@@ -58,7 +58,7 @@
 
       - name: set join worker token fact
         set_fact: swarm_worker_token="{{ swarm_worker_token.stdout }}"
-      when: inventory_hostname in ['m01']  # perform tasks only on master node
+      when: inventory_hostname in ['m01']  # perform tasks only on manager node
 
     - debug: var=hostvars['m01']['swarm_worker_token']
 

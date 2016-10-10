@@ -18,7 +18,7 @@ You will end up with 3 vagrant boxes:
 
 | Vagrant Machine Name | Docker Role |
 | ----- | ---- |
-| m01 | Master node |
+| m01 | Manager node |
 | w01 | Worker node |
 | w02 | Worker node |
 
