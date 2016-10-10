@@ -42,6 +42,12 @@
         name: docker-engine
         state: present
 
+    - name: ensure docker service will start on reboot
+      service: name=docker enabled=yes
+
+    - name: add vagrant user to docker group
+      user: append=yes groups=docker name=vagrant
+
     - block:
       - name: initialize a new swarm on master node
         command: docker swarm init --advertise-addr "{{ ansible_eth1["ipv4"]["address"] }}"
