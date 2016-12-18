@@ -22,7 +22,7 @@ nodes = [
    autostart: true},
 ]
 
-VAGRANT_VM_PROVIDER = "virtualbox"
+VAGRANT_VM_PROVIDER = ENV["VAGRANT_DEFAULT_PROVIDER"] || "virtualbox"
 ANSIBLE_RAW_SSH_ARGS = []
 
 Vagrant.configure("2") do |config|
@@ -39,7 +39,7 @@ Vagrant.configure("2") do |config|
     config.vm.define node[:hostname], autostart: (node[:autostart] || false) do |node_config|
       node_config.vm.box = node[:box]
       node_config.vm.hostname = fqdn
-      node_config.vm.synced_folder './','/vagrant'
+
       #node_config.ssh.forward_agent = true
       node_config.vm.network :private_network, ip: ip_address.to_s
 
@@ -47,6 +47,13 @@ Vagrant.configure("2") do |config|
         virtualbox.name = fqdn
         virtualbox.memory = node[:memory] || 2048
         virtualbox.cpus = 2
+        override.vm.synced_folder './','/vagrant'
+      end
+
+      node_config.vm.provider :libvirt do |libvirt, override|
+        libvirt.cpus = 2
+        libvirt.memory = node[:memory] || 2048
+        override.vm.synced_folder './', '/vagrant', :nfs =>true, :mount_options => ["vers=3"]
       end
 
       # Move to ip_address+1
