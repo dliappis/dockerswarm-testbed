@@ -23,3 +23,7 @@ You will end up with 3 vagrant boxes:
 | w02 | Worker node |
 
 After `vagrant up` is done, you should be able to `vagrant ssh <machinename>` and issue `docker node ls` to see the swarm nodes.
+
+[docker-swarm-visualizer](https://github.com/DovAmir/docker-swarm-visualizer) runs on m01 and you can access it on [https://192.168.2.100:3000](https://192.168.2.100:3000).
+
+And overlay network named `net001` will get configured too in case your application "stack" includes components that need to talk to each other.

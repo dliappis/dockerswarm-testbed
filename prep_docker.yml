@@ -65,3 +65,11 @@
     - name: join worker nodes
       command: docker swarm join --token "{{ hostvars['m01']['swarm_worker_token'] }}" "{{ hostvars['m01']['ansible_eth1']['ipv4']['address'] }}:2377"
       when: inventory_hostname in ['w01','w02']
+
+    - name: start the swarm visualizer on the manager node
+      command: docker run -it -d -p 3000:8080 -e HOST=m01 -v /var/run/docker.sock:/var/run/docker.sock manomarks/visualizer
+      when: inventory_hostname in ['m01']
+
+    - name: create an overlay network for a net001 app
+      command: docker network create net001 --driver overlay
+      when: inventory_hostname in ['m01']
