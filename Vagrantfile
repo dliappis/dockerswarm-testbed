@@ -6,16 +6,22 @@ require "ipaddr"
 boxname = "elastic/ubuntu-16.04-x86_64"
 base_ip = "192.168.124.100"
 domain_name = "swarm.com"
+default_ram = 2048
+default_cpu = 2
 
-nodes = [
-  {hostname: 'm01',    domain: domain_name,    box: boxname,    memory: 2048,    autostart: true},
-  {hostname: 'm02',    domain: domain_name,    box: boxname,    memory: 2048,    autostart: true},
-  {hostname: 'w01',    domain: domain_name,    box: boxname,    memory: 2048,    autostart: true},
-  {hostname: 'w02',    domain: domain_name,    box: boxname,    memory: 2048,    autostart: true},
-  {hostname: 'w03',    domain: domain_name,    box: boxname,    memory: 2048,    autostart: true},
-  {hostname: 'w04',    domain: domain_name,    box: boxname,    memory: 2048,    autostart: true},
+workers = 3
+masters = 3
 
-]
+nodes = []
+
+# box, cpu will be set to the defaults if not in the hash, you can add them in the hash for node customization
+for i in 1..masters
+   nodes += [{ hostname: "m%02d" % [i], domain: domain_name, autostart: true }]
+end
+for i in 1..workers
+   nodes += [{ hostname: "w%02d" % [i], domain: domain_name, autostart: true }]
+end
+
 
 VAGRANT_VM_PROVIDER = ENV["VAGRANT_DEFAULT_PROVIDER"] || "virtualbox"
 ANSIBLE_RAW_SSH_ARGS = []
@@ -32,7 +38,7 @@ Vagrant.configure("2") do |config|
   nodes.each do |node|
     fqdn = node[:hostname] + '.' + node[:domain]
     config.vm.define node[:hostname], autostart: (node[:autostart] || false) do |node_config|
-      node_config.vm.box = node[:box]
+      node_config.vm.box = node[:box] || boxname
       node_config.vm.hostname = fqdn
 
       #node_config.ssh.forward_agent = true
@@ -40,14 +46,14 @@ Vagrant.configure("2") do |config|
 
       node_config.vm.provider :virtualbox do |virtualbox, override|
         virtualbox.name = fqdn
-        virtualbox.memory = node[:memory] || 2048
-        virtualbox.cpus = 2
+        virtualbox.memory = node[:memory] || default_ram
+        virtualbox.cpus = node[:cpu] || default_cpu
         override.vm.synced_folder './','/vagrant'
       end
 
       node_config.vm.provider :libvirt do |libvirt, override|
-        libvirt.cpus = 2
-        libvirt.memory = node[:memory] || 2048
+        libvirt.cpus = node[:cpu] || default_cpu
+        libvirt.memory = node[:memory] || default_ram
         override.vm.synced_folder './', '/vagrant', :nfs =>true, :mount_options => ["vers=3"]
       end
 
