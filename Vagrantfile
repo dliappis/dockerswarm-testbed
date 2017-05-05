@@ -30,10 +30,10 @@ Vagrant.configure("2") do |config|
   ip_address = IPAddr.new base_ip
 
 
-#  # https://github.com/mitchellh/vagrant/pull/5765#issuecomment-120247738
-#  nodes.each do |node|
-#    ANSIBLE_RAW_SSH_ARGS << "-o IdentityFile=#{ENV["VAGRANT_DOTFILE_PATH"]}/machines/#{node[:hostname]}/#{VAGRANT_VM_PROVIDER}/private_key"
-#  end
+  # https://github.com/mitchellh/vagrant/pull/5765#issuecomment-120247738
+  #nodes.each do |node|
+  #  ANSIBLE_RAW_SSH_ARGS << "-o IdentityFile=#{ENV["VAGRANT_DOTFILE_PATH"]}/machines/#{node[:hostname]}/#{VAGRANT_VM_PROVIDER}/private_key"
+  #end
 
   nodes.each do |node|
     fqdn = node[:hostname] + '.' + node[:domain]
@@ -63,7 +63,7 @@ Vagrant.configure("2") do |config|
       if node == nodes.last
         node_config.vm.provision "ansible" do |ansible|
           #ansible.inventory_path = "static_inventory"
-          ansible.raw_ssh_args = ANSIBLE_RAW_SSH_ARGS
+          #ansible.raw_ssh_args = ANSIBLE_RAW_SSH_ARGS
           ansible.limit = "all"
           ansible.playbook = "prep_docker.yml"
         end

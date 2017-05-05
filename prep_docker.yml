@@ -57,6 +57,12 @@
       - name: set join manager token fact
         set_fact: swarm_manager_token="{{ swarm_manager_token.stdout }}"
 
+      - name: fetch docker compose
+        get_url:
+          url: https://github.com/docker/compose/releases/download/1.13.0/docker-compose-Linux-x86_64
+          dest: /usr/bin/docker-compose
+          mode: 0755
+
       when: inventory_hostname in ['m01']  # perform tasks only on manager node
 
     - debug: var=hostvars['m01']['swarm_worker_token']
