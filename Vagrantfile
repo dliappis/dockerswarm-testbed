@@ -17,7 +17,7 @@ nodes = [
 
 ]
 
-VAGRANT_VM_PROVIDER = ENV["VAGRANT_DEFAULT_PROVIDER"] || "libvirt"
+VAGRANT_VM_PROVIDER = ENV["VAGRANT_DEFAULT_PROVIDER"] || "virtualbox"
 ANSIBLE_RAW_SSH_ARGS = []
 
 Vagrant.configure("2") do |config|
