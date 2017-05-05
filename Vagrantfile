@@ -1,3 +1,6 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
 require "ipaddr"
 
 boxname = "elastic/ubuntu-16.04-x86_64"
@@ -5,21 +8,13 @@ base_ip = "192.168.124.100"
 domain_name = "swarm.com"
 
 nodes = [
-  {hostname: 'm01',
-   domain: domain_name,
-   box: boxname,
-   memory: 2048,
-   autostart: true},
-  {hostname: 'w01',
-   domain: domain_name,
-   box: boxname,
-   memory: 2048,
-   autostart: true},
-  {hostname: 'w02',
-   domain: domain_name,
-   box: boxname,
-   memory: 2048,
-   autostart: true},
+  {hostname: 'm01',    domain: domain_name,    box: boxname,    memory: 2048,    autostart: true},
+  {hostname: 'm02',    domain: domain_name,    box: boxname,    memory: 2048,    autostart: true},
+  {hostname: 'w01',    domain: domain_name,    box: boxname,    memory: 2048,    autostart: true},
+  {hostname: 'w02',    domain: domain_name,    box: boxname,    memory: 2048,    autostart: true},
+  {hostname: 'w03',    domain: domain_name,    box: boxname,    memory: 2048,    autostart: true},
+  {hostname: 'w04',    domain: domain_name,    box: boxname,    memory: 2048,    autostart: true},
+
 ]
 
 VAGRANT_VM_PROVIDER = ENV["VAGRANT_DEFAULT_PROVIDER"] || "virtualbox"
@@ -29,10 +24,10 @@ Vagrant.configure("2") do |config|
   ip_address = IPAddr.new base_ip
 
 
-  # https://github.com/mitchellh/vagrant/pull/5765#issuecomment-120247738
-  nodes.each do |node|
-    ANSIBLE_RAW_SSH_ARGS << "-o IdentityFile=#{ENV["VAGRANT_DOTFILE_PATH"]}/machines/#{node[:hostname]}/#{VAGRANT_VM_PROVIDER}/private_key"
-  end
+#  # https://github.com/mitchellh/vagrant/pull/5765#issuecomment-120247738
+#  nodes.each do |node|
+#    ANSIBLE_RAW_SSH_ARGS << "-o IdentityFile=#{ENV["VAGRANT_DOTFILE_PATH"]}/machines/#{node[:hostname]}/#{VAGRANT_VM_PROVIDER}/private_key"
+#  end
 
   nodes.each do |node|
     fqdn = node[:hostname] + '.' + node[:domain]

@@ -9,15 +9,6 @@
     distribution: "{{ ansible_distribution | lower }}"
     swarm_port: 2377
   tasks:
-    # - name: allow ports for docker swarm
-    #   iptables: chain=INPUT destination_port={{ item.port }} protocol={{ item.protocol }} jump=ACCEPT
-    #   with_items:
-    #     - {protocol: tcp, port: 2377}
-    #     - {protocol: tcp, port: 7946}
-    #     - {protocol: tcp, port: 4789}
-    #     - {protocol: udp, port: 7946}
-    #     - {protocol: udp, port: 4789}
-
     - name: ensure https apt transport exists
       package:
         name: '{{ item }}'
@@ -56,15 +47,28 @@
         command: docker swarm join-token worker -q
         register: swarm_worker_token
 
+      - name: get join worker token for swarm
+        command: docker swarm join-token manager -q
+        register: swarm_manager_token
+
       - name: set join worker token fact
         set_fact: swarm_worker_token="{{ swarm_worker_token.stdout }}"
+
+      - name: set join manager token fact
+        set_fact: swarm_manager_token="{{ swarm_manager_token.stdout }}"
+
       when: inventory_hostname in ['m01']  # perform tasks only on manager node
 
     - debug: var=hostvars['m01']['swarm_worker_token']
+    - debug: var=hostvars['m01']['swarm_manager_token']
 
     - name: join worker nodes
       command: docker swarm join --token "{{ hostvars['m01']['swarm_worker_token'] }}" "{{ hostvars['m01']['ansible_eth1']['ipv4']['address'] }}:2377"
-      when: inventory_hostname in ['w01','w02']
+      when: inventory_hostname[0] == 'w'
+
+    - name: join manager nodes
+      command: docker swarm join --token "{{ hostvars['m01']['swarm_manager_token'] }}" "{{ hostvars['m01']['ansible_eth1']['ipv4']['address'] }}:2377"
+      when: inventory_hostname[0] == 'm' and inventory_hostname != 'm01'
 
     - name: start the swarm visualizer on the manager node
       command: docker run -it -d -p 3000:8080 -e HOST=m01 -v /var/run/docker.sock:/var/run/docker.sock manomarks/visualizer
