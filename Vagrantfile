@@ -6,11 +6,14 @@ require "ipaddr"
 boxname = "elastic/ubuntu-16.04-x86_64"
 base_ip = "192.168.124.100"
 domain_name = "swarm.com"
-default_ram = 2048
-default_cpu = 2
 
-workers = 3
-masters = 3
+default_cpu = 2
+default_masters = 1
+default_ram = 2048
+default_workers = 2
+
+masters = ENV.has_key?('SWARM_MASTERS') ? ENV['SWARM_MASTERS'].to_i : default_masters
+workers = ENV.has_key?('SWARM_WORKERS') ? ENV['SWARM_WORKERS'].to_i : default_workers
 
 nodes = []
 
@@ -48,13 +51,17 @@ Vagrant.configure("2") do |config|
         virtualbox.name = fqdn
         virtualbox.memory = node[:memory] || default_ram
         virtualbox.cpus = node[:cpu] || default_cpu
-        override.vm.synced_folder './','/vagrant'
+        override.vm.synced_folder "./","/vagrant"
       end
 
       node_config.vm.provider :libvirt do |libvirt, override|
         libvirt.cpus = node[:cpu] || default_cpu
         libvirt.memory = node[:memory] || default_ram
-        override.vm.synced_folder './', '/vagrant', :nfs =>true, :mount_options => ["vers=3"]
+        override.vm.synced_folder ".", "/vagrant",
+          nfs: true,
+          nfs_version: 4,
+          nfs_udp: false
+        # ^^ alternatively use nfs_version: 3 and remove nfs_udp
       end
 
       # Move to ip_address+1
