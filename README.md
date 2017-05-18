@@ -8,9 +8,8 @@ For a tutorial of the swarm mode have a look at: https://docs.docker.com/engine/
 
 - Vagrant (preferably >=1.8.6)
 - Ansible >=2.0
-- Virtualbox >=5.0
-  or
-  [vagrant-libvirt] (https://github.com/vagrant-libvirt/vagrant-libvirt) on kvm + vagrant-sshfs
+- Virtualbox >=5.0 or
+  [vagrant-libvirt](https://github.com/vagrant-libvirt/vagrant-libvirt) on kvm + vagrant-sshfs
 
 ### Usage
 
