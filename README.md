@@ -9,10 +9,23 @@ For a tutorial of the swarm mode have a look at: https://docs.docker.com/engine/
 - Vagrant (preferably >=1.8.6)
 - Ansible >=2.0
 - Virtualbox >=5.0
+  or
+  [vagrant-libvirt] (https://github.com/vagrant-libvirt/vagrant-libvirt) on kvm + vagrant-sshfs
 
 ### Usage
 
+#### Virtualbox
+
 Just do `vagrant up`.
+Optionally, if you want to install ansible in a virtualenv: `make && source ve/bin/activate` and then `vagrant up`.
+
+#### Libvirt
+
+```shell
+make
+source ve/bin/activate # Will install vagrant-sshfs
+vagrant up
+```
 
 You will end up with 3 vagrant boxes:
 

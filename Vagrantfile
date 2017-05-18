@@ -57,11 +57,7 @@ Vagrant.configure("2") do |config|
       node_config.vm.provider :libvirt do |libvirt, override|
         libvirt.cpus = node[:cpu] || default_cpu
         libvirt.memory = node[:memory] || default_ram
-        override.vm.synced_folder ".", "/vagrant",
-          nfs: true,
-          nfs_version: 4,
-          nfs_udp: false
-        # ^^ alternatively use nfs_version: 3 and remove nfs_udp
+        override.vm.synced_folder ".", "/vagrant", type:"sshfs"
       end
 
       # Move to ip_address+1
