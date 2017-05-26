@@ -38,6 +38,12 @@ Vagrant.configure("2") do |config|
   #  ANSIBLE_RAW_SSH_ARGS << "-o IdentityFile=#{ENV["VAGRANT_DOTFILE_PATH"]}/machines/#{node[:hostname]}/#{VAGRANT_VM_PROVIDER}/private_key"
   #end
 
+  config.vm.provision 'shell', inline: <<-EOF
+    apt-get clean
+    rm -rf /var/lib/apt/lists/*
+    apt-get update
+  EOF
+
   nodes.each do |node|
     fqdn = node[:hostname] + '.' + node[:domain]
     config.vm.define node[:hostname], autostart: (node[:autostart] || false) do |node_config|
