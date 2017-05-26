@@ -17,20 +17,20 @@
         - apt-transport-https
         - ca-certificates
 
-    - name: add docker-engine apt key
+    - name: add docker apt key
       apt_key:
         keyserver: 'hkp://p80.pool.sks-keyservers.net:80'
-        id: '58118E89F3A912897C070ADBF76221572C52609D'
+        id: '9DC858229FC7DD38854AE2D88D81803C0EBFCD88'
 
-    - name: add docker-engine apt repository
+    - name: add docker apt repository
       apt_repository:
-        repo: "deb https://apt.dockerproject.org/repo {{ ansible_distribution | lower }}-{{ ansible_distribution_release }} main"
+        repo: "deb [arch=amd64] https://download.docker.com/linux/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} stable"
         update_cache: yes
         state: present
 
     - name: install the docker package
       package:
-        name: docker-engine
+        name: docker-ce
         state: present
 
     - name: ensure docker service will start on reboot

@@ -41,7 +41,6 @@ Vagrant.configure("2") do |config|
   config.vm.provision 'shell', inline: <<-EOF
     apt-get clean
     rm -rf /var/lib/apt/lists/*
-    apt-get update
   EOF
 
   nodes.each do |node|
