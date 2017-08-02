@@ -77,7 +77,7 @@
       when: inventory_hostname[0] == 'm' and inventory_hostname != 'm01'
 
     - name: start the swarm visualizer on the manager node
-      command: docker run -it -d -p 3000:8080 -e HOST=m01 -v /var/run/docker.sock:/var/run/docker.sock manomarks/visualizer
+      command: docker run -it -d -p 3000:8080 -e HOST=m01 -v /var/run/docker.sock:/var/run/docker.sock dockersamples/visualizer
       when: inventory_hostname in ['m01']
 
     - name: create an overlay network for a net001 app
